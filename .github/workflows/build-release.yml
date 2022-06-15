@@ -1,0 +1,85 @@
+name: Publish release
+
+on:
+  workflow_call:
+    inputs:
+      filename:
+        required: true
+        type: string
+    secrets:
+      COMPOSER_AUTH:
+        required: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build-release:
+    name: Build release
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        env:
+          runner: self-hosted
+        with:
+          php-version: 7.4
+          tools: composer, wp-cli
+
+      - name: Tool versions
+        run: |
+          node -v
+          php --version
+          composer --version
+          wp --version --allow-root
+
+      - uses: ./.github/actions/cache-deps
+        with:
+          workflow_name: build-release
+
+      - name: Install Composer dependencies
+        env:
+          COMPOSER_AUTH: '{"github-oauth": {"github.com": "${{ secrets.COMPOSER_AUTH }}"}}'
+        run: composer install
+
+      - name: Build zip
+        run: npm run build:zip
+
+      - name: Upload zip file
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ inputs.filename }}
+          path: build/${{ inputs.filename }}.zip
+
+  publish-release:
+    name: Publish release
+    runs-on: ubuntu-20.04
+    needs: build-release
+    steps:
+      - name: Download zip file
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ inputs.filename }}
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+
+      - name: Upload release zip
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./${{ inputs.filename }}.zip
+          asset_name: ${{ inputs.filename }}.zip
+          asset_content_type: application/zip
