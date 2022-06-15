@@ -43,15 +43,19 @@ jobs:
           COMPOSER_AUTH: '{"github-oauth": {"github.com": "${{ secrets.COMPOSER_AUTH }}"}}'
         run: composer install
 
-      - name: Run PHP_CodeSniffer
+      - name: Sets env vars for Pull Request
         if: github.event_name == 'pull_request'
-        continue-on-error: true
-        run: sh ./bin/phpcs-in-changes.sh "${{ github.event.pull_request.base.sha }}" "${{ github.event.after }}"
+        run: |
+          echo "FIRST_COMMIT_SHA=${{ github.event.pull_request.base.sha }}" >> $GITHUB_ENV
+
+      - name: Sets env vars for Push
+        if: github.event_name == 'push'
+        run: |
+          echo "FIRST_COMMIT_SHA=${{ github.event.before }}" >> $GITHUB_ENV
 
       - name: Run PHP_CodeSniffer
-        if: github.event_name == 'push'
         continue-on-error: true
-        run: sh ./bin/phpcs-in-changes.sh "${{ github.event.before }}" "${{ github.event.after }}"
+        run: sh ./bin/phpcs-in-changes.sh "${{ env.FIRST_COMMIT_SHA }}" "${{ github.event.after }}"
 
       - name: Show results
         run: cs2pr ./phpcs-report.xml
