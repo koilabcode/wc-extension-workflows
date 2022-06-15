@@ -44,8 +44,14 @@ jobs:
         run: composer install
 
       - name: Run PHP_CodeSniffer
+        if: github.event_name == 'pull_request'
         continue-on-error: true
         run: sh ./bin/phpcs-in-changes.sh "${{ github.event.pull_request.base.sha }}" "${{ github.event.after }}"
+
+      - name: Run PHP_CodeSniffer
+        if: github.event_name == 'push'
+        continue-on-error: true
+        run: sh ./bin/phpcs-in-changes.sh "${{ github.event.before }}" "${{ github.event.after }}"
 
       - name: Show results
         run: cs2pr ./phpcs-report.xml
