@@ -1,0 +1,28 @@
+name: Cache NPM Dependencies
+description: Creates and restores caches for dependencies.
+inputs:
+  workflow_name:
+    required: true
+    description: The name of the workflow.
+
+runs:
+  using: "composite"
+  steps:
+    - name: Get NPM cache directory
+      id: npm-cache-dir
+      shell: bash
+      run: |
+        echo "::set-output name=dir::$(npm config get cache)"
+
+    - name: NPM dependency caching
+      uses: actions/cache@v3
+      id: npm-cache
+      with:
+        path: ${{ steps.npm-cache-dir.outputs.dir }}
+        key: ${{ runner.os }}-${{ inputs.workflow_name }}-npm-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: ${{ runner.os }}-${{ inputs.workflow_name }}-npm-
+
+    - name: Install NPM dependencies
+      if: steps.npm-cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: npm install --no-optional

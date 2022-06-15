@@ -1,0 +1,51 @@
+name: Check PHP Coding Standards
+
+on:
+  workflow_call:
+    secrets:
+      COMPOSER_AUTH:
+        required: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  phpcs:
+    name: Checking standards
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 100
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        env:
+          runner: self-hosted
+        with:
+          php-version: 7.4
+          tools: composer, cs2pr
+
+      - name: Tool versions
+        run: |
+          node -v
+          php --version
+          composer --version
+
+      - uses: ./.github/actions/cache-deps
+        with:
+          workflow_name: pr-code-sniff
+
+      - name: Install Composer dependencies
+        env:
+          COMPOSER_AUTH: '{"github-oauth": {"github.com": "${{ secrets.COMPOSER_AUTH }}"}}'
+        run: composer install
+
+      - name: Run PHP_CodeSniffer
+        continue-on-error: true
+        run: sh ./bin/phpcs-in-changes.sh "${{ github.event.pull_request.base.sha }}" "${{ github.event.after }}"
+
+      - name: Show results
+        run: cs2pr ./phpcs-report.xml
