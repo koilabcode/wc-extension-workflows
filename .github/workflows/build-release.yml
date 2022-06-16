@@ -37,7 +37,7 @@ jobs:
           composer --version
           wp --version --allow-root
 
-      - uses: ./.github/actions/cache-deps
+      - uses: koilabcode/wc-extension-workflows/.github/actions/cache-deps.yml@main
         with:
           workflow_name: build-release
 

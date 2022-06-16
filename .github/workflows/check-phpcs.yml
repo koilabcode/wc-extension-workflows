@@ -34,9 +34,9 @@ jobs:
           php --version
           composer --version
 
-      - uses: ./.github/actions/cache-deps
+      - uses: koilabcode/wc-extension-workflows/.github/actions/cache-deps.yml@main
         with:
-          workflow_name: pr-code-sniff
+          workflow_name: check-phpcs
 
       - name: Install Composer dependencies
         env:
