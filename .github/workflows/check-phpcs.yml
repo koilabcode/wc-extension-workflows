@@ -34,7 +34,7 @@ jobs:
           php --version
           composer --version
 
-      - uses: koilabcode/wc-extension-workflows/.github/actions/cache-deps.yml@main
+      - uses: koilabcode/wc-extension-workflows/.github/actions/cache-deps@main
         with:
           workflow_name: check-phpcs
 
