@@ -64,7 +64,7 @@ jobs:
 
       - name: Run PHP_CodeSniffer
         continue-on-error: true
-        run: $PWD/bin/phpcs-in-changes.sh "${{ env.FIRST_COMMIT_SHA }}" "${{ github.event.after }}"
+        run: sh $PWD/bin/phpcs-in-changes.sh "${{ env.FIRST_COMMIT_SHA }}" "${{ github.event.after }}"
 
       - name: Show results
         run: cs2pr ./phpcs-report.xml
