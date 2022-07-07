@@ -27,7 +27,7 @@ jobs:
   phpcs:
     uses: koilabcode/wc-extension-workflows/.github/workflows/check-phpcs.yml@main
     secrets:
-      COMPOSER_AUTH: ${{ secrets.COMPOSER_AUTH }}
+      GITHUB_PAT: ${{ secrets.GITHUB_PAT }}
 ```
 
 ### Create Release
@@ -50,5 +50,5 @@ jobs:
     with:
       filename: woocommerce-extension
     secrets:
-      COMPOSER_AUTH: ${{ secrets.COMPOSER_AUTH }}
+      GITHUB_PAT: ${{ secrets.GITHUB_PAT }}
 ```

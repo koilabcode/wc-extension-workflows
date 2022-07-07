@@ -7,8 +7,9 @@ on:
         required: true
         type: string
     secrets:
-      COMPOSER_AUTH:
+      GITHUB_PAT:
         required: true
+        description: GitHub Personal Access Token.
 
 defaults:
   run:
@@ -40,7 +41,7 @@ jobs:
       - uses: koilabcode/wc-extension-workflows/.github/actions/install-deps@main
         with:
           workflow_name: build-release
-          github_pat: ${{ secrets.COMPOSER_AUTH }}
+          github_pat: ${{ secrets.GITHUB_PAT }}
 
       - name: Build zip
         run: npm run build:zip

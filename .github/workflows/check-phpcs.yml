@@ -3,8 +3,9 @@ name: Check PHP Coding Standards
 on:
   workflow_call:
     secrets:
-      COMPOSER_AUTH:
+      GITHUB_PAT:
         required: true
+        description: GitHub Personal Access Token.
 
 defaults:
   run:
@@ -37,7 +38,7 @@ jobs:
       - uses: koilabcode/wc-extension-workflows/.github/actions/install-composer-deps@main
         with:
           workflow_name: check-phpcs
-          github_pat: ${{ secrets.COMPOSER_AUTH }}
+          github_pat: ${{ secrets.GITHUB_PAT }}
 
       - name: Check current directory
         run: pwd
