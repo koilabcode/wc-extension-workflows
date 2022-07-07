@@ -34,7 +34,7 @@ jobs:
           php --version
           composer --version
 
-      - uses: koilabcode/wc-extension-workflows/.github/actions/install-deps@main
+      - uses: koilabcode/wc-extension-workflows/.github/actions/install-composer-deps@main
         with:
           workflow_name: check-phpcs
           github_pat: ${{ secrets.COMPOSER_AUTH }}
