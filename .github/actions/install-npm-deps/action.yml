@@ -1,10 +1,9 @@
-name: Cache NPM Dependencies
-description: Creates and restores caches for dependencies.
+name: Install NPM Dependencies
+description: Creates and restores caches for NPM dependencies and installs them.
 inputs:
   workflow_name:
     required: true
     description: The name of the workflow.
-
 runs:
   using: "composite"
   steps:

@@ -1,0 +1,21 @@
+name: Install Dependencies
+description: Install NPM and Composer dependencies.
+inputs:
+  workflow_name:
+    required: true
+    description: The name of the workflow.
+  github_pat:
+    required: true
+    description: GitHub Personal Access Token.
+
+runs:
+  using: "composite"
+  steps:
+    - uses: koilabcode/wc-extension-workflows/.github/actions/install-npm-deps@main
+      with:
+        workflow_name: ${{ inputs.workflow_name }}
+
+    - uses: koilabcode/wc-extension-workflows/.github/actions/install-composer-deps@main
+      with:
+        workflow_name: ${{ inputs.workflow_name }}
+        github_pat: ${{ inputs.github_pat }}

@@ -1,0 +1,33 @@
+name: Install Composer Dependencies
+description: Creates and restores caches for Composer dependencies and install them.
+inputs:
+  workflow_name:
+    required: true
+    description: The name of the workflow.
+  github_pat:
+    required: true
+    description: GitHub Personal Access Token.
+
+runs:
+  using: "composite"
+  steps:
+    - name: Get Composer Cache Directory
+      id: composer-cache-dir
+      shell: bash
+      run: |
+        echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+    - name: Composer dependency caching
+      uses: actions/cache@v3
+      id: composer-cache
+      with:
+        path: ${{ steps.composer-cache-dir.outputs.dir }}
+        key: ${{ runner.os }}-${{ inputs.workflow_name }}-composer-${{ hashFiles('**/composer.lock') }}
+        restore-keys: ${{ runner.os }}-${{ inputs.workflow_name }}-composer-
+
+    - name: Install Composer dependencies
+      if: steps.composer-cache.outputs.cache-hit != 'true'
+      env:
+        COMPOSER_AUTH: '{"github-oauth": {"github.com": "${{ inputs.github_pat }}"}}'
+      shell: bash
+      run: composer install

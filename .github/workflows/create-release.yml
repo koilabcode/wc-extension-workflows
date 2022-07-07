@@ -37,14 +37,10 @@ jobs:
           composer --version
           wp --version --allow-root
 
-      - uses: koilabcode/wc-extension-workflows/.github/actions/cache-deps@main
+      - uses: koilabcode/wc-extension-workflows/.github/actions/install-deps@main
         with:
           workflow_name: build-release
-
-      - name: Install Composer dependencies
-        env:
-          COMPOSER_AUTH: '{"github-oauth": {"github.com": "${{ secrets.COMPOSER_AUTH }}"}}'
-        run: composer install
+          github_pat: ${{ secrets.COMPOSER_AUTH }}
 
       - name: Build zip
         run: npm run build:zip
