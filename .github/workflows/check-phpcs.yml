@@ -27,11 +27,10 @@ jobs:
           runner: self-hosted
         with:
           php-version: 7.4
-          tools: composer, cs2pr
+          tools: composer
 
       - name: Tool versions
         run: |
-          node -v
           php --version
           composer --version
 
@@ -40,28 +39,9 @@ jobs:
           workflow_name: check-phpcs
           github_pat: ${{ secrets.GITHUB_PAT }}
 
-      - name: Check current directory
-        run: pwd
-
-      - name: Download PHPCS script
-        run: curl -o $PWD/bin/phpcs-in-changes.sh https://raw.githubusercontent.com/koilabcode/wc-extension-workflows/main/bin/phpcs-in-changes.sh
-
-      - name: Give script permissions
-        run: chmod +x $PWD/bin/phpcs-in-changes.sh
-
-      - name: Sets env vars for Pull Request
-        if: github.event_name == 'pull_request'
-        run: |
-          echo "FIRST_COMMIT_SHA=${{ github.event.pull_request.base.sha }}" >> $GITHUB_ENV
-
-      - name: Sets env vars for Push
-        if: github.event_name == 'push'
-        run: |
-          echo "FIRST_COMMIT_SHA=${{ github.event.before }}" >> $GITHUB_ENV
-
       - name: Run PHP_CodeSniffer
-        continue-on-error: true
-        run: sh $PWD/bin/phpcs-in-changes.sh "${{ env.FIRST_COMMIT_SHA }}" "${{ github.event.after }}"
-
-      - name: Show results
-        run: cs2pr ./phpcs-report.xml
+        uses: thenabeel/action-phpcs@v8
+        with:
+          files: "**.php"
+          phpcs_path: vendor/bin/phpcs
+          standard: phpcs.xml
