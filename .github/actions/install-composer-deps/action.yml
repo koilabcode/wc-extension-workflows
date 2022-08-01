@@ -14,8 +14,7 @@ runs:
     - name: Get Composer Cache Directory
       id: composer-cache-dir
       shell: bash
-      run: |
-        echo "::set-output name=dir::$(composer config cache-files-dir)"
+      run: echo "::set-output name=dir::$(composer config cache-files-dir)"
 
     - name: Composer dependency caching
       uses: actions/cache@v3
@@ -26,7 +25,6 @@ runs:
         restore-keys: ${{ runner.os }}-${{ inputs.workflow_name }}-composer-
 
     - name: Install Composer dependencies
-      if: steps.composer-cache.outputs.cache-hit != 'true'
       env:
         COMPOSER_AUTH: '{"github-oauth": {"github.com": "${{ inputs.github_pat }}"}}'
       shell: bash
